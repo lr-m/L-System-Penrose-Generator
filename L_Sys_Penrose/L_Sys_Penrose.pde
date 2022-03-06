@@ -4,22 +4,15 @@ ArrayList<L_System> fractal_generators;
 
 L_System l_system;
 
-Button reset, recenter;
-DropList fractalSelector;
-Slider lineWeight, lineHue;
-Slider percolation_slider;
-Slider penrose_col_1_slider, penrose_col_2_slider;
-
 boolean dragging = false;
 int initialX, initialY;
 int toTranslateX = 0, toTranslateY = 0;
 boolean initialsSet = false;
-int lineLength = 50;
+int lineLength = 52;
 int selected = 0;
 
 int current_iterations = 0;
 
-DropList modeSelector;
 int mode = 0;
 
 int dragStartX, dragStartY;
@@ -27,10 +20,10 @@ int savedLastDragX = 0, savedLastDragY = 0;
 
 Penrose penrose;
 
+Sidebar sidebar;
+
 void setup(){
     fullScreen();
-    
-    modeSelector = new DropList(25, 50, 200, 30, "Select Mode", new ArrayList(Arrays.asList("L-System", "Penrose (P2)")));
     
     fractal_generators = new ArrayList();
     
@@ -128,31 +121,32 @@ void setup(){
     anklets_rules.put('X', "XFX--XFX");
     fractal_generators.add(new L_System(width/2, height/2, "-X--X", anklets_rules, 45));
     
-    lineWeight = new Slider(50, 900, 150, 25, 1, 10);
-    lineHue = new Slider(50, 1000, 150, 25, 0, 255);
-    percolation_slider = new Slider(50, 800, 150, 25, 1000, 0);
-    
-    penrose_col_1_slider = new Slider(50, 500, 150, 25, 0, 255);
-    penrose_col_2_slider = new Slider(50, 650, 150, 25, 0, 255);
-    
     frameRate(60);
     stroke(0);
     
     initialX = width/2;
     initialY = height/2;
     
-    reset = new Button("Reset",25, height-100, 200, 30);
-    recenter = new Button("Recenter",25, height-150, 200, 30);
-    fractalSelector = new DropList(25, 150, 200, 30, "Select L-System", 
+    textAlign(CENTER, CENTER);
+    
+    penrose = new Penrose();
+    
+    sidebar = new Sidebar(250, 0, 30, 25);
+    
+    sidebar.addButton("Button:Reset", "Reset");
+    sidebar.addButton("Button:Recenter", "Recenter");
+    
+    sidebar.addDropList("Droplist:Mode", "Select Mode", new ArrayList(Arrays.asList("L-System", "Penrose (P2)")));
+    sidebar.addDropList("Droplist:Fractal", "Select L-System", 
         new ArrayList(Arrays.asList("Dragon Curve", "Hexagonal Gosper", 
             "Hilbert", "Von Koch Snowflake", "Crystal", "Triangle", 
             "Square Sierpinski", "Quadratic Koch Island", "Sierpinski Arrowhead", 
             "Rings", "Levy Curve", "Board", "Bush 1", "Bush 2", "Bush 3", "Bush 4", 
-            "Stick", "Quad Snowflake", "Pentaplexity", "Tiles", "Krishnas Ankles")));
-    
-    textAlign(CENTER, CENTER);
-    
-    penrose = new Penrose();
+            "Stick", "Quad Snowflake", "Pentaplexity", "Tiles", "Krishna Anklets")));
+            
+    sidebar.addSlider("Slider:Weight", "Line Weight", 1, 10);
+    sidebar.addSlider("Slider:Hue", "Line Hue", 0, 255);
+    sidebar.addSlider("Slider:Angle", "Angle", 0, 4);
     
     background(0);
 }
@@ -170,30 +164,40 @@ void mouseWheel(MouseEvent event) {
         background(0);
         pushMatrix();
         translate(toTranslateX, toTranslateY);
-        fractal_generators.get(selected).Draw((int) lineWeight.getValue(), (int) lineHue.getValue(), toTranslateX, toTranslateY);
+        fractal_generators.get(selected).Draw((int) Float.parseFloat(sidebar.getStringValue("Slider:Weight")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue")), toTranslateX, toTranslateY);
         popMatrix();
     }
     
-    drawUI();
+    sidebar.Draw();
 }
 
 int old_val = 0;
 
 void draw(){    
     if (mode == 0){
-        if (dragging && mouseX > 250){
+        if (dragging && !sidebar.isMouseOver()){
             background(0);
             pushMatrix();
             toTranslateX = (mouseX - width/2) - dragStartX + savedLastDragX;
             toTranslateY = (mouseY - height/2) - dragStartY + savedLastDragY;
             translate(toTranslateX, toTranslateY);
-            fractal_generators.get(selected).Draw((int) lineWeight.getValue(), (int) lineHue.getValue(), toTranslateX, toTranslateY);
+            fractal_generators.get(selected).Draw((int) Float.parseFloat(sidebar.getStringValue("Slider:Weight")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue")), toTranslateX, toTranslateY);
             popMatrix();
-        } else if (lineWeight.isActive() || lineHue.isActive()) {
+        }  else if (sidebar.isSliderActive("Slider:Weight") || sidebar.isSliderActive("Slider:Hue")) {
             background(0);
             pushMatrix();
             translate(toTranslateX, toTranslateY);
-            fractal_generators.get(selected).Draw((int) lineWeight.getValue(), (int) lineHue.getValue(), toTranslateX, toTranslateY);
+            fractal_generators.get(selected).Draw((int) Float.parseFloat(sidebar.getStringValue("Slider:Weight")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue")), toTranslateX, toTranslateY);
+            popMatrix();
+        } else if (sidebar.isSliderActive("Slider:Angle")) {
+            for (L_System l_system : fractal_generators){
+                l_system.setStartAngle(90 * (int) Float.parseFloat(sidebar.getStringValue("Slider:Angle")));
+            }
+            
+            background(0);
+            pushMatrix();
+            translate(toTranslateX, toTranslateY);
+            fractal_generators.get(selected).Draw((int) Float.parseFloat(sidebar.getStringValue("Slider:Weight")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue")), toTranslateX, toTranslateY);
             popMatrix();
         }
     } else {
@@ -203,101 +207,43 @@ void draw(){
              toTranslateX = (mouseX - width/2) - dragStartX + savedLastDragX;
              toTranslateY = (mouseY - height/2) - dragStartY + savedLastDragY;
              translate(toTranslateX, toTranslateY);
-             penrose.Draw(percolation_slider.getValue()/1000, penrose_col_1_slider.getValue(), penrose_col_2_slider.getValue());
+             penrose.Draw((Float.parseFloat(sidebar.getStringValue("Slider:Percolation"))/1000), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue1")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue2")));
              popMatrix();
          }
         
-         if (old_val != (int) percolation_slider.getValue()){
+         if (old_val != Float.parseFloat(sidebar.getStringValue("Slider:Percolation"))){
              background(0);
              pushMatrix();
              translate(toTranslateX, toTranslateY);
-             penrose.Draw(percolation_slider.getValue()/1000, penrose_col_1_slider.getValue(), penrose_col_2_slider.getValue());
+             penrose.Draw((Float.parseFloat(sidebar.getStringValue("Slider:Percolation"))/1000), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue1")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue2")));
              popMatrix();
              
-             old_val = (int) percolation_slider.getValue();
+             old_val = (int) Float.parseFloat(sidebar.getStringValue("Slider:Percolation"));
          }
          
-         if (penrose_col_1_slider.isActive() || penrose_col_2_slider.isActive()){
+         if (sidebar.isSliderActive("Slider:Hue1") || sidebar.isSliderActive("Slider:Hue2")){
              background(0);
              pushMatrix();
              translate(toTranslateX, toTranslateY);
-             penrose.Draw(percolation_slider.getValue()/1000, penrose_col_1_slider.getValue(), penrose_col_2_slider.getValue());
+             penrose.Draw((Float.parseFloat(sidebar.getStringValue("Slider:Percolation"))/1000), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue1")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue2")));
              popMatrix();
          }
     }
     
-    drawUI();
+    sidebar.Draw();
 }
 
 void keyPressed(){
-    if (mode == 0){
-        fractal_generators.get(selected).iterate();
-    } else if (mode == 1){
-         penrose.iterate();   
-    }
-    
-    redrawShape();
-}
-
-void drawUI(){
-    fill(255);
-    stroke(0);
-    strokeWeight(1);
-    rect(0, 0, 250, height);
-    
-    if (mode == 0){
-        fractalSelector.Draw();
- 
-        text("Line Weight", 125, 875);
-        text("Line Hue", 125, 975);
-        lineWeight.display();       
-        lineHue.display(); 
-        
-        recenter.Draw();
-    } else {
-        fill(0);
-        text("Percolation", 125, 775);
-        text("Hue 1", 125, 475);
-        text("Hue 2", 125, 625);
-        
-        percolation_slider.display();
-        penrose_col_1_slider.display();
-        penrose_col_2_slider.display();
-    }
-    
-    reset.Draw();
-    modeSelector.Draw();
-}
-
-void mousePressed(){
-    int modeCheck = modeSelector.checkForPress();
-    
-    if (mode-1 != modeCheck && modeCheck >= 0){
-         mode = modeCheck - 1;   
-         redrawShape();
-    }
-    
-    if (!dragging && mouseX > 250) {
-        dragging = true;
-        dragStartX = (mouseX - width/2);
-        dragStartY = (mouseY - height/2);
-    } else if (recenter.MouseIsOver()){
-        savedLastDragX = 0;
-        savedLastDragY = 0;
-        toTranslateX = 0;
-        toTranslateY = 0;
+    if (keyCode == ' '){
+        if (mode == 0){
+            fractal_generators.get(selected).iterate();
+        } else if (mode == 1){
+             penrose.iterate();   
+        }
         
         redrawShape();
-    }
-    
-    if (mode == 0){
-        int fractalCheck = fractalSelector.checkForPress();
-
-        if (fractalCheck >= 0){
-            selected = fractalCheck-1;
-            current_iterations = 0;
-            redrawShape();
-        } else if (reset.MouseIsOver()){
+    } else if (keyCode == 'r'){
+        if (mode == 0){
             fractal_generators.get(selected).reset();
             current_iterations = 0;
             
@@ -308,17 +254,63 @@ void mousePressed(){
             lineLength = 50;
             
             redrawShape();
-        } 
-        
-        lineWeight.press();
-        lineHue.press();
+        }
     } else if (mode == 1){
-        percolation_slider.press();
-        penrose_col_1_slider.press();
-        penrose_col_2_slider.press();
+        penrose.reset();
+        redrawShape();
+    }
+}
+
+void mousePressed(){
+    sidebar.mousePressed();
+    
+    int modeCheck = Integer.parseInt(sidebar.getStringValue("Droplist:Mode"));
+    
+    if (mode != modeCheck){
+         mode = modeCheck;   
+         
+         updateUI();
+         
+         redrawShape();
+    }
+    
+    if (!dragging && mouseX > 250) {
+        dragging = true;
+        dragStartX = (mouseX - width/2);
+        dragStartY = (mouseY - height/2);
+    } else if (Integer.parseInt(sidebar.getStringValue("Button:Recenter")) == 1){
+        savedLastDragX = 0;
+        savedLastDragY = 0;
+        toTranslateX = 0;
+        toTranslateY = 0;
         
-        if (reset.MouseIsOver()){
+        redrawShape();
+    }
+    
+    if (Integer.parseInt(sidebar.getStringValue("Button:Reset")) == 1){
+        if (mode == 0){
+            fractal_generators.get(selected).reset();
+            current_iterations = 0;
+            
+            savedLastDragX = 0;
+            savedLastDragY = 0;
+            toTranslateX = 0;
+            toTranslateY = 0;
+            lineLength = 50;
+            
+            redrawShape();
+        } else if (mode == 1){
             penrose.reset();
+            redrawShape();
+        }
+    } 
+    
+    if (mode == 0){
+        int fractalCheck = Integer.parseInt(sidebar.getStringValue("Droplist:Fractal"));
+        
+        if (fractalCheck >= 0){
+            selected = fractalCheck;
+            current_iterations = 0;
             redrawShape();
         }
     }
@@ -330,29 +322,53 @@ void redrawShape(){
     translate(toTranslateX, toTranslateY);
 
     if (mode == 0){
-        fractal_generators.get(selected).Draw((int) lineWeight.getValue(), (int) lineHue.getValue(), toTranslateX, toTranslateY);
+        fractal_generators.get(selected).Draw((int) Float.parseFloat(sidebar.getStringValue("Slider:Weight")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue")), toTranslateX, toTranslateY);
     } else if (mode == 1){
-         penrose.Draw(percolation_slider.getValue()/1000, penrose_col_1_slider.getValue(), penrose_col_2_slider.getValue());  
+         penrose.Draw((int) (Float.parseFloat(sidebar.getStringValue("Slider:Percolation"))/1000), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue1")), (int) Float.parseFloat(sidebar.getStringValue("Slider:Hue2")));  
     }
     
     popMatrix();
-    drawUI();
+    sidebar.Draw();
 }
 
 void mouseReleased(){
+    sidebar.mouseReleased();
+    
     if (dragging){
         dragging = false;
         savedLastDragX = toTranslateX;
         savedLastDragY = toTranslateY;
     }
-    
-    lineWeight.release();
-    lineHue.release();
-    percolation_slider.release();
-    penrose_col_1_slider.release();
-    penrose_col_2_slider.release();
 }
 
 float degreesToRadians(float degrees){
     return (degrees * PI)/180;
+}
+
+void updateUI(){
+    if (mode == 1){
+        sidebar.removeComponent("Slider:Angle");
+        sidebar.removeComponent("Slider:Hue");
+        sidebar.removeComponent("Slider:Weight");
+        sidebar.removeComponent("Droplist:Fractal");
+        
+        sidebar.addSlider("Slider:Percolation", "Percolation", 1000, 0);
+        sidebar.addSlider("Slider:Hue1", "Hue 1", 0, 255);
+        sidebar.addSlider("Slider:Hue2", "Hue 1", 0, 255);
+    } else {
+        sidebar.removeComponent("Slider:Hue2");
+        sidebar.removeComponent("Slider:Hue1");
+        sidebar.removeComponent("Slider:Percolation");
+        
+        sidebar.addDropList("Droplist:Fractal", "Select L-System", 
+            new ArrayList(Arrays.asList("Dragon Curve", "Hexagonal Gosper", 
+                "Hilbert", "Von Koch Snowflake", "Crystal", "Triangle", 
+                "Square Sierpinski", "Quadratic Koch Island", "Sierpinski Arrowhead", 
+                "Rings", "Levy Curve", "Board", "Bush 1", "Bush 2", "Bush 3", "Bush 4", 
+                "Stick", "Quad Snowflake", "Pentaplexity", "Tiles", "Krishna Anklets")));
+            
+        sidebar.addSlider("Slider:Weight", "Line Weight", 1, 10);
+        sidebar.addSlider("Slider:Hue", "Line Hue", 0, 255);
+        sidebar.addSlider("Slider:Angle", "Angle", 0, 4);
+    }
 }

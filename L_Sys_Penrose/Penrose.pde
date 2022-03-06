@@ -16,6 +16,8 @@ class Penrose {
         stroke(0);
         strokeWeight(2);
         
+        println(prob, hue_1, hue_2);
+        
         for (IShape shape: subshapes) {
             shape.Draw(prob, hue_1, hue_2);
         }

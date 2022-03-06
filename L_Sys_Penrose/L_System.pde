@@ -42,7 +42,8 @@ class L_System{
     char push_stack = '[';
     char pop_stack = ']';
     
-    float currDirection = -90;
+    float startAngle = 180;
+    float currDirection = 0;
     int currY, currX;
     int startX, startY;
         
@@ -69,13 +70,17 @@ class L_System{
         this.currentString = new_string;
     }
     
+    void setStartAngle(int angle){
+        this.startAngle = angle;
+    }
+    
     void Draw(int lineWeight, int hue, int translatedX, int translatedY){
         this.currX = startX;
         this.currY = startY;
         
         strokeWeight(lineWeight);
         
-        currDirection = -90;
+        currDirection = startAngle;
         
         strokeWeight(lineWeight);
         colorMode(HSB);

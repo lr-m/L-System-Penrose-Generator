@@ -1,4 +1,4 @@
-# l_system_penrose
+# L-Systems & Penrose Tiling (P2)
 Quick processing sketch that produces L-System fractals and Penrose tiling (P2).
 
 Download Processing to run the project.

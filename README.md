@@ -19,4 +19,4 @@ Here are some example fractals produced by the program.
 
 Uses subdivision to create the tiling, can also percolate to create random patterns, as well as changing the colours for both the half-hite and half-dart.
 
-<img src="https://user-images.githubusercontent.com/47477832/156945731-c143eac1-b374-4c76-b455-d323e9460627.PNG" width="700">
+<img src="https://user-images.githubusercontent.com/47477832/156945731-c143eac1-b374-4c76-b455-d323e9460627.PNG" width="800">

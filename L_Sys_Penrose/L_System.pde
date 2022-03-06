@@ -1,21 +1,52 @@
 import java.util.HashMap;
+import java.util.Stack;
+
+class State{
+    float curr_angle;
+    int currY;
+    int currX;
+    
+     State(float curr_angle, int currX, int currY){
+         this.curr_angle = curr_angle;
+         this.currY = currY;
+         this.currX = currX;
+     }
+     
+     int getCurrX(){
+          return this.currX;
+     }
+     
+     int getCurrY(){
+          return this.currY;
+     }
+     
+     float getCurrAngle(){
+          return this.curr_angle;
+     }
+}
 
 class L_System{
     HashMap<Character, String> rules =
         new HashMap<Character, String>();
         
+    Stack<State> state_stack = new Stack<State>();
+        
     String currentString;
     String startString;
-    int angle;
-    char left;
-    char right;
-    char forwards;
+    float angle;
+    char left = '+';
+    char right = '-';
+    char forwards_with_line = 'F';
+    char forwards_without_line = 'f';
+    char reverse = '|';
+    char push_stack = '[';
+    char pop_stack = ']';
     
-    int currDirection = 0;
+    float currDirection = -90;
     int currY, currX;
     int startX, startY;
         
-    L_System(int startX, int startY, String axiom, HashMap<Character, String> rules, int angle, char left, char right, char forwards){
+    L_System(int startX, int startY, String axiom, HashMap<Character, String> rules, float angle){
         this.startX = startX;
         this.startY = startY;
         
@@ -23,10 +54,6 @@ class L_System{
         this.startString = axiom;
         this.rules = rules;
         this.angle = angle;
-        
-        this.left = left;
-        this.right = right;
-        this.forwards = forwards;
     }
     
     void iterate(){
@@ -48,13 +75,13 @@ class L_System{
         
         strokeWeight(lineWeight);
         
-        currDirection = 0;
+        currDirection = -90;
         
         strokeWeight(lineWeight);
         colorMode(HSB);
         
         for (char instruction : this.currentString.toCharArray()){
-            if (instruction == this.forwards){
+            if (instruction == this.forwards_with_line){
                 stroke(hue, 255, 255);
                 
                 this.goForward(translatedX, translatedY);
@@ -62,6 +89,12 @@ class L_System{
                 this.turnLeft();
             } else if (instruction == this.right){
                 this.turnRight();
+            } else if (instruction == this.push_stack){
+                this.pushStack();
+            } else if (instruction == this.pop_stack){
+                this.popStack();
+            } else if (instruction == this.reverse){
+                this.reverseDir();
             }
             
         }
@@ -87,10 +120,29 @@ class L_System{
         }
     }
     
+    void reverseDir(){
+        currDirection = currDirection - 180;
+        
+        if (currDirection < 0){
+             currDirection += 360;   
+        }
+    }
+    
+    void pushStack(){
+        this.state_stack.push(new State(this.currDirection, this.currX, this.currY));
+    }
+    
+    void popStack(){
+        State popped = state_stack.pop();
+        this.currDirection = popped.getCurrAngle();
+        this.currX = popped.getCurrX();
+        this.currY = popped.getCurrY();
+    }
+    
     void goForward(int translatedX, int translatedY){
         drawLine(currX, currY, 
-            currX += lineLength * Math.round(10 * Math.cos(degreesToRadians(currDirection)))/10, 
-            currY += lineLength * Math.round(10 * Math.sin(degreesToRadians(currDirection)))/10, 
+            currX += lineLength * Math.round(1000 * Math.cos(degreesToRadians(currDirection)))/1000, 
+            currY += lineLength * Math.round(1000 * Math.sin(degreesToRadians(currDirection)))/1000, 
             translatedX, translatedY);
     }
     

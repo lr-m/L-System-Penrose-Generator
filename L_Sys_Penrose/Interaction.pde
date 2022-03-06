@@ -59,7 +59,7 @@ class DropList {
             }
           
             int currY = y + h;
-            int col = 250;
+            int col = 225;
             for (int i = 0; i <= animateI; i++) {
                 fill(col);
                 rect(x, currY, w - 20, h, h);

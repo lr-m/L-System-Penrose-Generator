@@ -7,11 +7,14 @@ class Penrose {
         int radius = 750;
 
         subshapes.add(new Sun(width / 2, height / 2, radius));
+        
+        iterate();
     }
 
     void Draw(float prob, float hue_1, float hue_2) {
         fill(255);
-        noStroke();
+        stroke(0);
+        strokeWeight(2);
         
         for (IShape shape: subshapes) {
             shape.Draw(prob, hue_1, hue_2);

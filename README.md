@@ -7,20 +7,16 @@ Download Processing to run the project.
 
 Here are some example fractals produced by the program.
 
-Dragon Curve:
+<img src="https://user-images.githubusercontent.com/47477832/156945724-d3866eac-2d71-44ab-ad2e-d62eafdb54c1.PNG" width="800">
 
-<img src="https://user-images.githubusercontent.com/47477832/156783280-fcc4f45d-f2e1-4ff4-8d65-9ef12d65a565.PNG" width="700">
+<img src="https://user-images.githubusercontent.com/47477832/156945717-b81b732b-7932-4e8b-b174-1abcbff4b2c2.PNG" width="800">
 
-Hexagonal Gosper:
+<img src="https://user-images.githubusercontent.com/47477832/156945718-38b69286-5806-4cc9-95ea-1713b59ce61d.PNG" width="800">
 
-<img src="https://user-images.githubusercontent.com/47477832/156783282-4b605112-ff3e-47a4-9983-71023b203ee7.PNG" width="700">
-
-Levy Curve:
-
-<img src="https://user-images.githubusercontent.com/47477832/156783284-1e7308ca-994e-412d-b084-cf8f63c2c26b.PNG" width="700">
+<img src="https://user-images.githubusercontent.com/47477832/156945720-1a25e392-9ec1-46c9-b44a-0586d339624a.PNG" width="800">
 
 ## Penrose Tiling (P2)
 
 Uses subdivision to create the tiling, can also percolate to create random patterns, as well as changing the colours for both the half-hite and half-dart.
 
-<img src="https://user-images.githubusercontent.com/47477832/156784456-ffc403fb-039c-4c6b-a0f3-eec7652a4de6.PNG" width="700">
+<img src="https://user-images.githubusercontent.com/47477832/156945731-c143eac1-b374-4c76-b455-d323e9460627.PNG" width="700">

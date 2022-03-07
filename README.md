@@ -3,6 +3,14 @@ Quick processing sketch that produces L-System fractals and Penrose tiling (P2).
 
 Download Processing to run the project.
 
+NOTE: No limit on iterations, so pushing it too hard will cause it to crash!
+
+## Controls
+
+- SPACE - Iterates the L-System/subdivides the Penrose Tiles
+- To use the sidebar, move the mouse to the left edge of the screen
+- Use the dropdown lists to switch between modes/fractals, and the slider to adjust elements of the visualisation
+
 ## L_System
 
 Here are some example fractals produced by the program.
